@@ -90,3 +90,62 @@ npx babel --watch src --out-dir . --presets @babel/preset-react
 
 - react 패키지에서 우리가 위에서 내려받았던 파일이 포함
 - react, react-dom 으로 인해서 외부 패키지 프로젝트를 쉽게 내려받을 수 있음
+
+### create-react-app 사용해 보기
+
+- 웹 애플리케이션을 만둘기 위한 환경을 제공
+- 바벨과 웹팩도 호함되어 있음
+- 그 밖의 테스트 시스템, HMR(hot-module-replacement)
+- ES6+, css 후 처리
+
+> 사용
+
+    npx create-react-app cra-test
+
+- 자동으로 변경이 되는 점
+
+  - 이는 HMR이라는 기능 덕분
+  - npm start 실행 시 create-react-app이 로컬 서버를 뛰워 주기 때문에 가능한 일
+  - npm start 실행 시 로컬 시
+
+- index.html
+- index.js
+
+  - 두개의 파일은 예약된 파일 이므로 지우면 안됨
+
+- 검색엔진 최적화가 중요하다면 create-react-app 보다는
+- 서버사이드 렌더링에 특화된 넥스트(next.js)를 사용하는게 좋음
+
+- serviceWoker.js 파일에는 PWA(progressive web app)과 관련된 코드가 들어 있음
+- PWA는 오프라인에서도 잘 동작하는 파일을 만들기 위한 파일
+- PWA 기능을 원할 시 index.js 파일에 serviceWorkcer.register(); 코드를 추가
+
+### 주요 명령어
+
+- package.json 네 가지 npm 스크립트 명령어
+
+- 개발 모드로 실행
+
+  - npm start
+  - HMR(hot-module-replacement)이 동작하기 때문에 코드를 수정하면 바로 반영
+  - 코드 에러와 자동반영이 특징이다.
+
+- https 옵션을 제공
+  - API 호출시에 도움을 줌
+  - MAC : HTTPS=ture npm start
+  - Window : set HTTPS=true && npm start
+  - 자체 서명된 인증서를 사용하여 https 사이트로 입장을 진행
+
+### 빌드하기
+
+- npm run build
+
+  - 배포 환경에서 사용할 파일을 만들어줌
+  - 빌드 후 생성된 정적 파일을 사용자가 내려 받게 만들면 됨
+  - 노드 환경에서 동작하는 웹 서버 어플리케이션
+  - 정적 파일을 서비스 할 때 간단하게 사용
+
+- build/static 폴더 밑에 생성된 파일의 이름에 해시값이 포함
+- 파일의 내용이 변경되지 않으면 해시값은 같음
+- 새로 빌드를 하더라도 변경점이 없는 파일은 브라우저내 캐싱되어 있는 파일이 사용
+- -> 재방문을 하더라도 페이지가 빠르게 랜더링 된다는 점이 특징
