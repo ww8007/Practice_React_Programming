@@ -149,3 +149,120 @@ npx babel --watch src --out-dir . --presets @babel/preset-react
 - 파일의 내용이 변경되지 않으면 해시값은 같음
 - 새로 빌드를 하더라도 변경점이 없는 파일은 브라우저내 캐싱되어 있는 파일이 사용
 - -> 재방문을 하더라도 페이지가 빠르게 랜더링 된다는 점이 특징
+
+- 많은 css 파일을 import 하더라도 같은 장소에 저장
+- 이미지 파일 크기가 10킬로 바이트보다 작은 경우 별도 파일이 생성되지 않고
+- data url 형태로 제공
+
+### 테스트 코드 실행하기
+
+npm test를 입력하면 테스트 코드 실행
+
+- create-react-app에는 제스트(jest)라는 테스트 프레임워크 기반으로 테스트 시스템이 구축
+- App.text.js 파일이 생성
+
+- 테스트 파일 인식
+  1. **test** 폴더 밑에 있는 모든 자바스크립트 파일
+  1. 파일 이름이 .test.js로 끝나는 파일
+  1. 파일 이름이 .spec.js로 끝나는 파일
+
+> 실행
+
+    npm test
+
+- CI(continuos intergration) 같이 watch 모드가 필요 없는 환경에서는 다음 명령어 사용
+  - 맥 : CI=true npm test
+  - 윈도우 : set "CI=true" && npm test
+
+### 설정 파일 추출하기
+
+> 실행
+
+    npm run eject
+
+- npm run eject를 실행 시 숨겨져 있던 cra의 내부 설정 파일이 밖으로 노출되게 됨
+- 이 기능을 사용하면 바벨이나 웹팩의 설정을 변경 가능하다.
+- 단점 : 개선하거나 추가된 기능이 패키지 버전을 올리는 식으로 적용되지 않음
+
+- run eject 이외의 설정 변경 법
+
+  1. react-scripts 프로젝트를 포크(fork)해서 나만의 스크립트를 만듬
+     - 자유도가 높기 때문에 원하는 부분을 얼마든지 수정 가능
+     - 수정된 내용을 여러 프로젝트에서 공통으로 사용할 수 있는 장점
+  1. react-app-rewired 패키지를 사용
+
+- but 두가지 방법 다 cra 이후에 변경된 내용을 쉽게 적용할 수 없다는 단점
+
+### 자바스크립트 지원 범위
+
+1. 지수 연산자
+1. async await
+1. rest-operator(나머지 연산자), spread-operator(전개 연산자)
+1. dynamic import
+1. class filed
+1. JSX 문법
+1. typesciprt(ts), flow(플로) 타입 시스템
+
+- 타입스크립트를 지원
+- 기본 설정에서 아무런 폴리필(polyfill)도 포함되지 않는다.
+- ES6+에서 추가된 객체나 함수를 사용하고 싶다면 직접 폴리필에 추가
+- ES8에 추가된 String.padStart 함수를 사용 하고 싶은 경우
+  - core-js 패키지를 이용해서 다양한 폴리필을 선택적으로 사용가능
+  - npm i core-js
+
+### 폴리필
+
+- index.js 파일에서 한 번만 가져오면 모든 곳에서 자유롭게 사용이 가능
+- 바벨에서도 @babel/polyfill, @babel/preset-env 프리셋을 이용하면
+- 폴리필을 추가 가능
+- 사용하지 않은 폴리필 까지 추가되는 점에서 번들의 크기가 커지는 단점이 존재
+- but env 형태의 폴리필을 추가하면 불필요한 파일들이 포함되는 **단점**
+
+> 폴리필의 정의
+
+    새로운 자바스크립트 표준이 나와도 브라우저가 지원하지 않으면 말짱 도루묵
+    실행 시점에 주입하고자 하는 함수나 객체가 현재 환경에 존재하는지 검사해서 존재 하지 않는 경우에만 주입
+    기능이 존재하는지 검새해서 그 기능이 없는 경우메나 주입하는 것을 폴리필이라고 함
+
+### 코드 분할하기
+
+- 코드 분할(code spliting)을 이용하면 사용자에게 필요한 양의 코드만 내려줄 수 있음
+- 코드 분할을 하지 않으면 전체 코드를 한 번에 내려주기 때문에 첫 페이지 로딩 오래걸림
+- 코드 분할의 한 간지 방법 **동적 임포트**
+
+```js
+import React, { useState } from "react";
+
+export default function TodoList() {
+  const [todos, setTodos] = useState([]); //- (1)
+  const onClick = () => {
+    //- (2)
+    import("./Todo.js").then(({ Todo }) => {
+      //- (3)
+      const position = todos.length + 1;
+      const newTodo = <Todo key={position} title={`할 일 ${position}`}></Todo>; //- (4)
+      setTodos([...todos, newTodo]);
+    });
+  };
+  return (
+    <div>
+      <button onClick={onClick}>할 일 추가</button>
+      {todos} // - (5)
+    </div>
+  );
+}
+```
+
+1. 할일 목록 관리할 상태값 정의
+1. 할 일 추가 버튼을 누르면 호출 되는 이벤트 처리 함수
+1. 동적 임포트를 사용함
+   - 동적 임포트는 프로미스를 반환하기 때문에 then 메서드를 이용해서 이후 동작 정의 가능
+1. 비동기로 가져온 Todo 컴포넌트를 이용해서 새로운 할 일 생성
+1. 상태값 저장된 할 일 목록을 모두 출력
+
+- build/static.js
+- 배포 환경에서 브라우저 캐싱 효과를 보기 위해 파일 이름이 해시값이 추가
+- 단일 페이지 에플리케이션을 만들기 위해 react-router-dom 패키지를 이용하는 경우
+- react-router-dom 기능을 이용해서 페이지 단위로 코드 분할을 적용가능
+
+### 환경 변수 사용하기
