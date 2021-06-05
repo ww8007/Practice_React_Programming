@@ -1,0 +1,12 @@
+{
+  "name": "ch02_es6",
+  "version": "1.0.0",
+  "description": "### 향상된 비동기 프로그래밍 1: 프로미스",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
