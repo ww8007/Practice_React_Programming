@@ -24,7 +24,7 @@ function Profiledispatch() {
   return (
     <div>
       <Profiledispatch.Provider value={dsipatch}>
-        <SomeComponent />
+        <div />
       </Profiledispatch.Provider>
     </div>
   );
