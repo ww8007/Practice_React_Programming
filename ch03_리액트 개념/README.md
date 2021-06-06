@@ -253,3 +253,66 @@ const element = React.createElement(
 
 1. 하나의 컴포넌트에서 훅을 호출하는 순서는 항상 같아야 한다.
 1. 훅은 함수형 컴포넌트 또는 커스텀 훅 안에서만 호출 되어야 한다.
+
+### context API 이해하기
+
+-  속성값을 기계적으로 써내려 가는 것이 아닌 좀 더 효과적인 방법으로 전달이 가능
+-  createContext를 통한 context 생성
+
+   -  ```js
+      React.createContext(defaultValue) => {Prvider, Consumer}
+      ```
+   -  상위 컴포넌트에서는 Provider 컴포넌트를 이용해서 데이터를 전달
+   -  하위 컴포넌트에서는 Consumer 컴포넌트를 이용해서 데이터를 사용
+      -  Consumer 컴포넌트는 데이터를 찾기 위해 상위로 올라가면서 가장 가까운 Provider 사용
+      -  만약 찾지 못한다면 기본값을 사용
+   -  Provider 컴포넌트의 속성값이 변경되면 모든 Consumer 컴포넌트는 다시 랜더링
+   -  그러나 중요한 점이 중간에 위치한 컴포넌트의 랜더링 여부가 상관 없이 다시 랜더링 됨
+   -  이를 React.memo를 사용해서 다시 랜더링 되지 않도록 수정
+
+```js
+import React from "react";
+
+const UserContext = React.createContext("");
+
+function App() {
+   return (
+      <div>
+         <UserContext.Provider value="mike">
+            <div>상단 메뉴</div>
+            <Profile />
+            <div>하단 메뉴</div>
+         </UserContext.Provider>
+      </div>
+   );
+}
+React.memo를 이용해서 만들어 졌고 속성값이 없기 때문에 최초 한번만 랜더링 됨
+const Profile = React.memo(() => {
+   return (
+      <div>
+         <Greeting />
+         {/*....*/}
+      </div>
+   );
+});
+
+function Greeting() {
+   return (
+      <UserContext.Consumer>
+         {(username) => <p>{`${username}님 안녕하세요`}</p>}
+      </UserContext.Consumer>
+   );
+}
+
+export default App;
+
+```
+
+### 콘텍스트 API 활용하기
+
+-  createContext를 두 번 이용해서 두개의 context를 생성 가능하다.
+
+-  하위 컴포넌트에서 콘텍스트 데이터를 수정하기
+   -  하위 컴포넌트에서도 콘텍스트를 수정 가능하다.
+   -  리덕스에서 상태를 변경하는 dispatch(디스패치) 함수를 여러 컴포넌트에서 사용하는 것과 같은 개념
+   -  useState를 이용해서 value로 **이벤트 처리 함수**를 넘겨주면 사용이 가능하다.

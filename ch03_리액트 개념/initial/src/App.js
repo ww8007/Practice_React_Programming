@@ -1,14 +1,34 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 
-export default function App() {
-   const [width, setWidth] = useState(window.innerWidth);
-   useEffect(() => {
-      const onResize = () => setWidth(window.innerWidth);
-      window.addEventListener("resize", onResize);
-      return () => {
-         window.removeEventListener("resize", onResize);
-      };
-   }, []);
+const UserContext = React.createContext("");
 
-   return <div>{`widht is ${width}`}</div>;
+function App() {
+   return (
+      <div>
+         <UserContext.Provider value="mike">
+            <div>상단 메뉴</div>
+            <Profile />
+            <div>하단 메뉴</div>
+         </UserContext.Provider>
+      </div>
+   );
 }
+
+const Profile = React.memo(() => {
+   return (
+      <div>
+         <Greeting />
+         {/*....*/}
+      </div>
+   );
+});
+
+function Greeting() {
+   return (
+      <UserContext.Consumer>
+         {(username) => <p>{`${username}님 안녕하세요`}</p>}
+      </UserContext.Consumer>
+   );
+}
+
+export default App;
