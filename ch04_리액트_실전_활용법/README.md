@@ -39,3 +39,66 @@
 
 - 변수가 숫자 타입인 경우 0은 거짓
 - 문자열 타입인 경우 빈 문자열도 거짓
+
+- 아래의 첫번 째 값은 캐시가 0원 일 때도 출력을 해야 하는데 출력을 안함
+- 숫자 0이 덩그라니 출력
+- 아래와 같이 해결 -> undefined도 아니고 null이 아니면 참
+
+```js
+{
+  cash && <div>{cash}원 보유중</div>;
+}
+{
+  cash != null && <div>{cash}원 보유중</div>;
+}
+```
+
+- 변수가 배열인 경우에는 기본값으로 빈 배열을 넣어주는 것이 좋음
+- reducer에서도 초기값을 설정할 때 이렇게 사용하는데
+  - 이러한 이유가 있는 것은 처음 알았다.
+- map함수에서 && 연산자를 사용해서 검사를 할 필요가 없다는 것이 장점
+
+- 부모 컴포넌트 조건에 따라 자식 컴포넌트 마운트 언마운트
+  - 상태값도 사라지고 렌더링 성능에도 안좋은 영향
+  - 필요한 조건을 부모에서 설정해서 자식 조건이 간단해지는 장점
+
+> 작성 요령
+
+    코드 리뷰를 할 때 조건부 렌더링 쪽 코드가 복잡해서 힘든 경우가 많음
+    이를 배려해서 작성하는 것이 좋음
+
+### 관심사의 분리 프레젠테이션, 컨테이너 분리
+
+- 기능별로 분리하는 것이 장점
+- 속성값으로부터 새로운 상태값을 만드는 예
+
+```js
+import React from "react";
+import { useState } from "react";
+
+function Present({ todos }) {
+  const [doneList, setDoneList] = useState(todos.filter((item) => item.done));
+  function onChange(key, name) {
+    setDoneList(
+      doneList.map((item) => (item.key === key ? { ...item, name } : item))
+    );
+  }
+  return <div></div>;
+}
+
+export default Present;
+```
+
+- onChange 함수를 통해서 목록의 이름을 수정하는 순간 부모가 가진 데이터와 sync가 맞지 않음
+- 자식 컴포넌트에서 부모의 데이터를 별도의 상태값으로 관리하는 것은 나쁜 습관
+- 비즈니스 로직과 상태값은 일부 컴포넌트로 한정해서 관리하는 것이 좋음
+- 컴포넌트에 비즈니스 로직이나 상태값이 있어 재사용을 못하면 코드 중복 -> 게으름, 기술 부채
+
+> 속성값으로 부터 상태값 만드는 것
+
+    getDerivedStateFromProps가 이 기능을 위해 존재
+    데이터를 복제하여 사용하는 것이 나쁨
+    name 변경의 순간 새로운 객체 생성 -> 더 이상 부모의 객체 참조 x
+    상태값을 불변 객체로 관리하기 때문
+    -> doneList를 useMemo를 이용해서 생성
+    -> onChangeName 함수를 부모로부터 속성 값으로 받음
