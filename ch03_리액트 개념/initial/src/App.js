@@ -1,24 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 export default function App() {
-   const [colors, setColor] = useState("red");
-   const [counts, setCount] = useState(0);
-   function onClick() {
-      setColor("blue");
-   }
-   const onClick2 = () => {
-      setCount(counts + 1);
-      setCount(counts + 1);
-   };
+   const [width, setWidth] = useState(window.innerWidth);
+   useEffect(() => {
+      const onResize = () => setWidth(window.innerWidth);
+      window.addEventListener("resize", onResize);
+      return () => {
+         window.removeEventListener("resize", onResize);
+      };
+   }, []);
 
-   return (
-      <>
-         <button style={{ backgroundColor: colors }} onClick={onClick}>
-            좋아요
-         </button>
-         <br></br>
-         <button onClick={onClick2}>up</button>
-         <div>{counts}</div>
-      </>
-   );
+   return <div>{`widht is ${width}`}</div>;
 }
