@@ -316,3 +316,55 @@ export default App;
    -  하위 컴포넌트에서도 콘텍스트를 수정 가능하다.
    -  리덕스에서 상태를 변경하는 dispatch(디스패치) 함수를 여러 컴포넌트에서 사용하는 것과 같은 개념
    -  useState를 이용해서 value로 **이벤트 처리 함수**를 넘겨주면 사용이 가능하다.
+
+### ref 속성값으로 자식 요소에 접근하기
+
+-  리액트로 작업하다 보면 돔 요소에 직접 접근해야 할 때가 있음
+-  돔 요소에 포커스를 주거나 돔 요소의 크기나 스크롤 위치를 알고 싶은 경우
+-  이 때 ref 속성 값을 이용하면 자식 요소에 직접 가능
+-  자식 요소 : 컴포넌트, 돔 요소 일 수 있음
+
+```js
+import React, { useRef, useEffect } from "react";
+
+function Ref() {
+   const inputRef = useRef();
+   // 아래와 같이 current.focus로 랜더링 시 포커스 가능
+   useEffect(() => {
+      inputRef.current.focus();
+   }, []);
+
+   return (
+      <div>
+         <input type="text" ref={inputRef} />
+         <button>저장</button>
+      </div>
+   );
+}
+
+export default Ref;
+```
+
+### ref 속성값 활용하기
+
+1. 함수형 컴포넌트에서 ref 속성 값 사용하기
+
+-  클래스형 컴포넌트에서 ref 속성값을 입력하면 ref.current는 해당 컴포넌트의 인스턴스를 가르킴
+-  ref.current로 해당 클래스의 메서드를 호출 가능
+
+-  함수형 컴포넌트는 인스턴스로 만들어지지 않지만
+-  useImperativeHandle 훅을 사용하면 함수형 컴포넌트에서도 변수와 함수를 외부로 노출 가능
+
+### ref 속성값으로 함수 사용하기
+
+-  ref 속성값에 함수를 입력하는 경우
+-  코드를 실행하여도 의도한 대로 동작하지 않음
+
+   -  컴포넌트가 랜더링될 때 마다 새로운 함수를 ref 속성으로 넣어주기 때문
+   -  리액트는 ref 속성값으로 새로운 함수가 들어오면 이전 함수에 null 인수를 넣어서 호출하고
+   -  새로운 함수에는 요소의 참조값을 넣어서 호출
+
+-  문제점 해결
+   -  useCallback 함수 사용
+   -  useCallback 훅의 메모이제이션 기능 덕분에 한 번 생성된 함수를 계속 재사용
+   -  input 요소가 생성되거나 제거될 때만 setInitialText 함수가 호출됨
