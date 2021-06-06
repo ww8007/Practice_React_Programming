@@ -2,6 +2,7 @@ import React from "react";
 import Ref from "./ref/Ref";
 import Hi from "./ref/Hi";
 import Ref_using from "./ref/Ref_using";
+import Reducer from "./useReducer/Reducer";
 const UserContext = React.createContext("");
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
       {/* <Ref></Ref> */}
       <Hi> </Hi>
       <Ref_using></Ref_using>
+      <Reducer></Reducer>
     </div>
   );
 }
